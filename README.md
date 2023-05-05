@@ -36,3 +36,23 @@ more accurate. We show the benchmarks below.
 
 Figure 1 is a simple illustration of the piecewise flows in action
 in comparison with a normal Masked Autoregressive Flow.
+
+## Figure 2
+
+Figure 2 shows how we determine the numnber of clusters for each distribution
+based on the silouette score using one of the benchmarks as an example.
+
+## Benchmarks
+
+Uses code from Stimper's [normflows](https://github.com/VincentStimper/normalizing-flows)
+package, Stimper's [Resampled Base Flows work](https://github.com/VincentStimper/resampled-base-flows)
+and the package [*margarine*](https://github.com/htjb/margarine) 
+to demonstrate the relative performance of each model explored in the paper.
+
+The `benchmarks.py` code generates samples from a series of target distributions
+from `target_dists_stimper.py`, fits the samples with a simple MAF, a realNVP
+flow with a resampled base distribution and the piecewise MAF, calculates
+the KL divergence between the flow and the target distribution and an associated
+error. It then plots the distributions as in the example above. This is repeated
+10 times to attempt to account for uncertainty in the caluclation of the KL
+divergence. `benchmark_duplicates/` contains the trained flows used in the paper.
