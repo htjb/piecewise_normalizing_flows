@@ -56,3 +56,42 @@ the KL divergence between the flow and the target distribution and an associated
 error. It then plots the distributions as in the example above. This is repeated
 10 times to attempt to account for uncertainty in the caluclation of the KL
 divergence. `benchmark_duplicates/` contains the trained flows used in the paper.
+
+## Citation
+
+If you use the piecewise approach please cite the paper
+
+**Bibtex**
+```
+@ARTICLE{2023arXiv230502930B,
+       author = {{Bevins}, Harry and {Handley}, Will},
+        title = "{Piecewise Normalizing Flows}",
+      journal = {arXiv e-prints},
+     keywords = {Statistics - Machine Learning, Computer Science - Machine Learning},
+         year = 2023,
+        month = may,
+          eid = {arXiv:2305.02930},
+        pages = {arXiv:2305.02930},
+archivePrefix = {arXiv},
+       eprint = {2305.02930},
+ primaryClass = {stat.ML},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023arXiv230502930B},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+```
+
+## Requirements
+
+The code requires;
+
+- [numpy](https://numpy.org)
+- [matplotlib](https://matplotlib.org)
+- [tensorflow](https://www.tensorflow.org)
+- [tensorflow_probability](https://www.tensorflow.org/probability)
+- [scipy](https://scipy.org)
+- [sklearn](https://scikit-learn.org/stable/)
+- [pytorch](https://pytorch.org)
+- [normflows](https://github.com/VincentStimper/normalizing-flows)
+- [anesthetic](https://github.com/handley-lab/anesthetic)
+- [tqdm](https://github.com/tqdm/tqdm)
+- [larsflows](https://github.com/VincentStimper/resampled-base-flows)
