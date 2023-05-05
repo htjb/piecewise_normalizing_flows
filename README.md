@@ -59,7 +59,7 @@ divergence. `benchmark_duplicates/` contains the trained flows used in the paper
 
 ## Citation
 
-If you use the piecewise approach please cite the paper
+If you use the piecewise approach in your work please cite the paper
 
 **Bibtex**
 ```
