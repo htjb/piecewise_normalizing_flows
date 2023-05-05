@@ -30,7 +30,7 @@ In the paper we compare the accuracy of our approach to that of Stimper et al. 2
 with a series of toy examples and find that the piecewise normalizing flows are
 more accurate. We show the benchmarks below.
 
-![Benchmarks](Figures/example_benchmarks.pdf)
+![Benchmarks](Figures/example_benchmarks.png)
 
 ## Figure 1
 
