@@ -24,7 +24,7 @@ MAFs based on the initial split of samples between clusters and calculate
 the log-probability of sample by summing the probability on each MAF. The figure
 below shows the approach.
 
-![Piecewise Normalizing Flows](https://github.com/htjb/piecewise_normalizing_flows/tree/main/Figures/Piecewise_NF.png)
+<img src="https://github.com/htjb/piecewise_normalizing_flows/tree/main/Figures/Piecewise_NF.pn" width=800 />
 
 In the paper we compare the accuracy of our approach to that of Stimper et al. 2022
 with a series of toy examples and find that the piecewise normalizing flows are
