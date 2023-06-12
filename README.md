@@ -4,9 +4,27 @@ The repository includes the code for the experiments performed in and plots
 shown in the paper 
 [Piecewise Normalizing Flows](https://arxiv.org/abs/2305.02930).
 
-The code currently relies on the branch 
-[clustering_implementation](https://github.com/htjb/margarine/tree/clustering_implementation)
-in the repository [*margarine*](https://github.com/htjb/margarine).
+The piecewise normalising flows are implemented with
+[*margarine*](https://github.com/htjb/margarine). The following code
+demonstrates how to initialise, train and sample from a piecewise normalising
+flow
+
+```python
+from margarine.maf import MAF
+
+# here I am assuming your samples are in a numpy array theta and there is a corresponding set of weights
+# setting clustering=True sets this up as a piecewise normalising flow
+flow = MAF(theta, weights, clustering=True)
+
+# train the maf
+flow.train(5000, early_stop=True)
+
+# margarine samples from the clusters as described in the paper
+samples = flow.sample(5000)
+
+# and calcualtes probabilities too
+log_prob = flow.log_prob(samples)
+```
 
 The piecewise normalizing flows (NFs) are designed to improve the accuracy of
 normalizing flows when learning multi-modal distributions. NFs typically
@@ -84,6 +102,7 @@ archivePrefix = {arXiv},
 
 The code requires;
 
+- [margarine](https://github.com/htjb/margarine)
 - [numpy](https://numpy.org)
 - [matplotlib](https://matplotlib.org)
 - [tensorflow](https://www.tensorflow.org)
