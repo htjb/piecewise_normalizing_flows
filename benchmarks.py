@@ -143,8 +143,8 @@ lr_schedule = keras.optimizers.schedules.ExponentialDecay(
 
 nsample= 10000
 kl_nsample= 10000
-pEpochs = 1000
-epochs = 1000
+pEpochs = 20000
+epochs = 20000
 
 base = 'updated_benchmark_duplicates/'
 
@@ -152,7 +152,7 @@ base = 'updated_benchmark_duplicates/'
 tm_maf_kls, tm_nvp_kls, tm_clus_kls = [], [], []
 rm_maf_kls, rm_nvp_kls, rm_clus_kls = [], [], []
 cgm_maf_kls, cgm_nvp_kls, cgm_clus_kls = [], [], []
-for d in range(3):
+for d in range(10):
     fig, axes = plt.subplots(3, 4, figsize=(6.3, 5))
 
     # generate samples with Stimpers RingMixture model
