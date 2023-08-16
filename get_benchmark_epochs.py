@@ -99,23 +99,23 @@ for d in range(5):
     rm_clustermaf_epochs.append(np.sum([len(sAFlow.flow[i].loss_history) for i in range(len(sAFlow.flow))]))
 
 
-print('cgm maf epochs: ', np.mean(cgm_maf_epochs), ' +/- ', np.std(cgm_maf_epochs))
-print('cgm clustermaf epochs: ', np.mean(cgm_clustermaf_epochs),  ' +/- ', np.std(cgm_clustermaf_epochs))
+print('cgm maf epochs: ', np.mean(cgm_maf_epochs), ' +/- ', np.std(cgm_maf_epochs)/np.sqrt(5))
+print('cgm clustermaf epochs: ', np.mean(cgm_clustermaf_epochs),  ' +/- ', np.std(cgm_clustermaf_epochs)/np.sqrt(5))
 
-print('tm maf epochs: ', np.mean(tm_maf_epochs), ' +/- ', np.std(tm_maf_epochs))
-print('tm clustermaf epochs: ', np.mean(tm_clustermaf_epochs),  ' +/- ', np.std(tm_clustermaf_epochs))
+print('tm maf epochs: ', np.mean(tm_maf_epochs), ' +/- ', np.std(tm_maf_epochs)/np.sqrt(5))
+print('tm clustermaf epochs: ', np.mean(tm_clustermaf_epochs),  ' +/- ', np.std(tm_clustermaf_epochs)/np.sqrt(5))
 
-print('rm maf epochs: ', np.mean(rm_maf_epochs), ' +/- ', np.std(rm_maf_epochs))
-print('rm clustermaf epochs: ', np.mean(rm_clustermaf_epochs),  ' +/- ', np.std(rm_clustermaf_epochs))
+print('rm maf epochs: ', np.mean(rm_maf_epochs), ' +/- ', np.std(rm_maf_epochs)/np.sqrt(5))
+print('rm clustermaf epochs: ', np.mean(rm_clustermaf_epochs),  ' +/- ', np.std(rm_clustermaf_epochs)/np.sqrt(5))
 
-print('cgm maf time: ', np.mean(cgm_maf_time), ' +/- ', np.std(cgm_maf_time))
-print('cgm clustermaf time: ', np.mean(cgm_clustermaf_time),  ' +/- ', np.std(cgm_clustermaf_time))
+print('cgm maf time: ', np.mean(cgm_maf_time), ' +/- ', np.std(cgm_maf_time)/np.sqrt(5))
+print('cgm clustermaf time: ', np.mean(cgm_clustermaf_time),  ' +/- ', np.std(cgm_clustermaf_time)/np.sqrt(5))
 
-print('tm maf time: ', np.mean(tm_maf_time), ' +/- ', np.std(tm_maf_time))
-print('tm clustermaf time: ', np.mean(tm_clustermaf_time),  ' +/- ', np.std(tm_clustermaf_time))
+print('tm maf time: ', np.mean(tm_maf_time), ' +/- ', np.std(tm_maf_time)/np.sqrt(5))
+print('tm clustermaf time: ', np.mean(tm_clustermaf_time),  ' +/- ', np.std(tm_clustermaf_time)/np.sqrt(5))
 
-print('rm maf time: ', np.mean(rm_maf_time), ' +/- ', np.std(rm_maf_time))
-print('rm clustermaf time: ', np.mean(rm_clustermaf_time),  ' +/- ', np.std(rm_clustermaf_time))
+print('rm maf time: ', np.mean(rm_maf_time), ' +/- ', np.std(rm_maf_time)/np.sqrt(5))
+print('rm clustermaf time: ', np.mean(rm_clustermaf_time),  ' +/- ', np.std(rm_clustermaf_time)/np.sqrt(5))
 
 cgm_cluster_number = np.array(cgm_cluster_number)
 tm_cluster_number = np.array(tm_cluster_number)
@@ -125,6 +125,6 @@ cgm_clsutermaf_time = np.array(cgm_clustermaf_time)
 tm_clustermaf_time = np.array(tm_clustermaf_time)
 rm_clustermaf_time = np.array(rm_clustermaf_time)
 
-print('cgm time per cluster: ', np.mean(cgm_clustermaf_time/cgm_cluster_number))
-print('tm time per cluster: ', np.mean(tm_clustermaf_time/tm_cluster_number))
-print('rm time per cluster: ', np.mean(rm_clustermaf_time/rm_cluster_number))
+print('cgm time per cluster: ', np.mean(cgm_clustermaf_time/cgm_cluster_number) + np.std(cgm_clustermaf_time/cgm_cluster_number)/np.sqrt(5))
+print('tm time per cluster: ', np.mean(tm_clustermaf_time/tm_cluster_number) + np.std(tm_clustermaf_time/tm_cluster_number)/np.sqrt(5))
+print('rm time per cluster: ', np.mean(rm_clustermaf_time/rm_cluster_number) + np.std(rm_clustermaf_time/rm_cluster_number)/np.sqrt(5))
