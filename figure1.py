@@ -2,6 +2,7 @@ import numpy as np
 from anesthetic import MCMCSamples
 import matplotlib.pyplot as plt
 from margarine.maf import MAF
+from margarine.clustered import clusterMAF
 
 # generate a set of multi-modal samples
 nsamples = 5000
@@ -17,29 +18,29 @@ names = [i for i in range(data.shape[-1])]
 fig, axes = plt.subplots(1, 3, figsize=(6.3, 3))
 
 # plot original samples
-axes[0].hist2d(data[:, 0], data[:, 1], bins=80)
+axes[0].hist2d(data[:, 0], data[:, 1], bins=80, cmap='Blues')
 
 # try and load the example maf only flow else generate and plot samples
 try:
-    bij = MAF.load("figure1_normal_maf.pkl")
+    bij = MAF.load("figure1_normal_maf_.pkl")
 except:
     bij = MAF(samples[names].values, 
-              samples.get_weights().astype('float64'))
+              weights=samples.get_weights().astype('float64'))
     bij.train(10000, early_stop=True)
     bij.save("figure1_normal_maf.pkl")
 bij_samples = bij.sample(nsamples)
-axes[1].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80)
+axes[1].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80, cmap='Blues')
 
 # try and load the example cluster maf only flow else generate and plot samples
 try:
-    bij = MAF.load("figure1_cluster.pkl")
+    bij = clusterMAF.load("figure1_cluster_.pkl")
 except:
-    bij = MAF(samples[names].values, 
-              samples.get_weights().astype('float64'), clustering=True)
+    bij = clusterMAF(samples[names].values, 
+              weights=samples.get_weights().astype('float64'), clustering=True)
     bij.train(10000, early_stop=True)
     bij.save("figure1_cluster.pkl")
 bij_samples = bij.sample(nsamples)
-axes[2].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80)
+axes[2].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80, cmap='Blues')
 
 # formatting
 title = ['Target.', 'MAF\nGaussian Base\ne.g. Papamakarios et al. 2017', 
