@@ -10,8 +10,6 @@ nsample= 10000
 pEpochs = 10000
 epochs = 10000
 
-base = 'updated_benchmark_duplicates/'
-
 cgm = CircularGaussianMixture()
 tm = TwoMoons()
 rm = RingMixture()
