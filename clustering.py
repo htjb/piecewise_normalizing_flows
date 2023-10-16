@@ -144,14 +144,14 @@ for d in range(10):
         losses = []
         for k in ks:
             sc = MiniBatchKMeans(k, random_state=0)
-            labels = sc.fit_prediction(s)
+            labels = sc.fit_predict(s)
             losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = MiniBatchKMeans(cluster_number, random_state=0)
-        cluster_labels = clu.fit_prediction(s)
+        cluster_labels = clu.fit_predict(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -197,14 +197,14 @@ for d in range(10):
         losses = []
         for k in ks:
             sc = SpectralClustering(k, random_state=0)
-            labels = sc.fit_prediction(s)
+            labels = sc.fit_predict(s)
             losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = SpectralClustering(cluster_number, random_state=0)
-        cluster_labels = clu.fit_prediction(s)
+        cluster_labels = clu.fit_predict(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -235,14 +235,14 @@ for d in range(10):
         losses = []
         for k in ks:
             ac = AgglomerativeClustering(k)
-            labels = ac.fit_prediction(s)
+            labels = ac.fit_predict(s)
             losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = AgglomerativeClustering(cluster_number)
-        cluster_labels = clu.fit_prediction(s)
+        cluster_labels = clu.fit_predict(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -267,14 +267,14 @@ for d in range(10):
         losses = []
         for k in ks:
             ac = Birch(n_clusters=k)
-            labels = ac.fit_prediction(s)
+            labels = ac.fit_predict(s)
             losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = Birch(n_clusters=cluster_number)
-        cluster_labels = clu.fit_prediction(s)
+        cluster_labels = clu.fit_predict(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
