@@ -68,7 +68,7 @@ try:
     flow = clusterMAF.load('miniboone_clustermaf.pkl')
 except:
     _ = clusterMAF(data_train)
-    nn = math.ciel(17424/_.cluster_number/2904)
+    nn = math.ceil(17424/_.cluster_number/2904)
     print('number clusters: ', _.cluster_number, ' number_networks: ', nn)
 
     kmeans = KMeans(_.cluster_number, random_state=0)
