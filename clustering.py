@@ -123,7 +123,7 @@ for d in range(2):
     try:
         SAFlow = clusterMAF.load(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
     except:
-        ks = np.arange(2, 5)
+        ks = np.arange(2, 21)
         losses = []
         for k in ks:
             sc = MiniBatchKMeans(k, random_state=0)
@@ -176,7 +176,7 @@ for d in range(2):
     try:
         sAFlow = clusterMAF.load(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
     except:
-        ks = np.arange(2, 5)
+        ks = np.arange(2, 21)
         losses = []
         for k in ks:
             sc = SpectralClustering(k, random_state=0)
@@ -207,7 +207,7 @@ for d in range(2):
     try:
         sAFlow = clusterMAF.load(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
     except:
-        ks = np.arange(2, 5)
+        ks = np.arange(2, 21)
         losses = []
         for k in ks:
             ac = AgglomerativeClustering(k)
@@ -239,7 +239,7 @@ for d in range(2):
     try:
         sAFlow = clusterMAF.load(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
     except:
-        ks = np.arange(2, 5)
+        ks = np.arange(2, 21)
         losses = []
         for k in ks:
             ac = Birch(n_clusters=k)
