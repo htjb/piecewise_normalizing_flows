@@ -75,7 +75,7 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 
 # repeating for N times to get errors on KLs
 kls_repeats, errorkl_repeats = [], []
-for d in range(2):
+for d in range(10):
     kls, kl_errors = [], []
     fig, axes = plt.subplots(2, 4, figsize=(6.3, 5))
 
