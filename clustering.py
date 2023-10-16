@@ -33,7 +33,7 @@ def get_cluster_number(cluster_algorithm, samples):
     for k in ks:
         cluster_algorithm = cluster_algorithm(k, random_state=0)
         labels = cluster_algorithm.fit(samples).predict(samples)
-        losses.append(-silhouette_score(samples, labels))
+        losses.append(-silhouette_score(s, labels))
     losses = np.array(losses)
     minimum_index = np.argmin(losses)
     cluster_number = ks[minimum_index]
@@ -60,6 +60,7 @@ def calc_kl(samples, Flow, base):
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
     return kldiv, kl_error
 
+PLOT_CLUSTERS = False
 
 nsample= 10000
 kl_nsample= 10000
@@ -77,13 +78,20 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 kls_repeats, errorkl_repeats = [], []
 for d in range(10):
     kls, kl_errors = [], []
-    fig, axes = plt.subplots(2, 4, figsize=(6.3, 5))
+    if PLOT_CLUSTERS:
+        fig, axes =plt.subplots(4, 4, figsize=(6.3, 10))
+    else:
+        fig, axes = plt.subplots(2, 4, figsize=(6.3, 5))
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
     s = rm.sample(nsample).numpy()
     axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
     axes[0, 0].set_title('Target')
+    if PLOT_CLUSTERS:
+        axes[2, 0].scatter(s[:, 0], s[:, 1], s=1, c='C0',
+                           cmap='inferno')
+        axes[2, 0].set_title('Target')
 
     try:
         sAFlow = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
@@ -97,6 +105,10 @@ for d in range(10):
     kl_errors.append(kl_error)
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
     axes[0, 1].set_title('MAF')
+    if PLOT_CLUSTERS:
+        axes[2, 1].scatter(s[:, 0], s[:, 1], s=1, c='C0',
+                           cmap='inferno')
+        axes[2, 1].set_title('MAF')
 
     # kmeans flow for ring model
     try:
@@ -117,7 +129,12 @@ for d in range(10):
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 2].set_title('KMeans')
+    axes[0, 2].set_title('K-Means')
+    if PLOT_CLUSTERS:
+        for i in range(np.unique(sAFlow.cluster_labels).shape[0]):
+            axes[2, 2].scatter(sAFlow.split_theta[i][:, 0], sAFlow.split_theta[i][:, 1], 
+                            s=1, c=plt.get_cmap('inferno')(np.unique(sAFlow.cluster_labels)[i]/sAFlow.cluster_number))
+        axes[2, 2].set_title('K-Means')
 
     # minibatch kmeans flow for ring model
     try:
@@ -127,14 +144,14 @@ for d in range(10):
         losses = []
         for k in ks:
             sc = MiniBatchKMeans(k, random_state=0)
-            labels = sc.fit_predict(samples)
-            losses.append(-silhouette_score(samples, labels))
+            labels = sc.fit_prediction(s)
+            losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = MiniBatchKMeans(cluster_number, random_state=0)
-        cluster_labels = clu.fit_predict(samples)
+        cluster_labels = clu.fit_prediction(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -180,14 +197,14 @@ for d in range(10):
         losses = []
         for k in ks:
             sc = SpectralClustering(k, random_state=0)
-            labels = sc.fit_predict(samples)
-            losses.append(-silhouette_score(samples, labels))
+            labels = sc.fit_prediction(s)
+            losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = SpectralClustering(cluster_number, random_state=0)
-        cluster_labels = clu.fit_predict(samples)
+        cluster_labels = clu.fit_prediction(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -202,6 +219,13 @@ for d in range(10):
     kl_errors.append(kl_error)
     axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
     axes[1, 1].set_title('Spectral \n Clustering')
+    if PLOT_CLUSTERS:
+        for i in range(len(np.unique(sAFlow.cluster_labels)+1)):
+            print(i)
+            print(np.unique(sAFlow.cluster_labels))
+            axes[3, 1].scatter(sAFlow.split_theta[i][:, 0], sAFlow.split_theta[i][:, 1], 
+                            s=1, c=plt.get_cmap('inferno')(np.unique(sAFlow.cluster_labels)[i]/sAFlow.cluster_number))
+        axes[3, 1].set_title('Spectral \n Clustering')
 
     # agglomerative_clustering flow for ring model
     try:
@@ -211,14 +235,14 @@ for d in range(10):
         losses = []
         for k in ks:
             ac = AgglomerativeClustering(k)
-            labels = ac.fit_predict(samples)
-            losses.append(-silhouette_score(samples, labels))
+            labels = ac.fit_prediction(s)
+            losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = AgglomerativeClustering(cluster_number)
-        cluster_labels = clu.fit_predict(samples)
+        cluster_labels = clu.fit_prediction(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -243,14 +267,14 @@ for d in range(10):
         losses = []
         for k in ks:
             ac = Birch(n_clusters=k)
-            labels = ac.fit_predict(samples)
-            losses.append(-silhouette_score(samples, labels))
+            labels = ac.fit_prediction(s)
+            losses.append(-silhouette_score(s, labels))
         losses = np.array(losses)
         minimum_index = np.argmin(losses)
         cluster_number = ks[minimum_index]
 
         clu = Birch(n_clusters=cluster_number)
-        cluster_labels = clu.fit_predict(samples)
+        cluster_labels = clu.fit_prediction(s)
         n_clusters = len(np.unique(cluster_labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
 
@@ -272,7 +296,10 @@ for d in range(10):
             axes[i, j].set_yticks([])
 
     plt.tight_layout()
-    plt.savefig(base + 'clustering_' + str(d) + '.pdf')
+    if PLOT_CLUSTERS:
+        plt.savefig(base + 'clustering_' + str(d) + '_clusters.pdf')
+    else:
+        plt.savefig(base + 'clustering_' + str(d) + '.pdf')
     #plt.show()
     plt.close()
 
