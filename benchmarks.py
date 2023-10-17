@@ -161,7 +161,8 @@ for d in range(10):
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
-    s = rm.sample(nsample).numpy()
+    s_kl = rm.sample(nsample)
+    s = s_kl.numpy()
     axes[2, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
      # noraml maf for ring model
@@ -204,8 +205,8 @@ for d in range(10):
         file = open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s).detach().numpy()
-    target_logprob = rm.log_prob(s).detach().numpy()
+    logprob = model.log_prob(s_kl).detach().numpy()
+    target_logprob = rm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
@@ -262,8 +263,8 @@ for d in range(10):
         file = open(base + "tm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s).detach().numpy()
-    target_logprob = tm.log_prob(s).detach().numpy()
+    logprob = model.log_prob(s_kl).detach().numpy()
+    target_logprob = tm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
@@ -335,8 +336,8 @@ for d in range(10):
         file = open(base + "cgm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s).detach().numpy()
-    target_logprob = cgm.log_prob(s).detach().numpy()
+    logprob = model.log_prob(s_kl).detach().numpy()
+    target_logprob = cgm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
