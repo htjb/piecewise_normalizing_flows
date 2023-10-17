@@ -310,7 +310,7 @@ for d in range(10):
 
     # cluster flow for circle of gaussians
     try:
-        sAFlow = MAF.load(base + "cgm_cluster_maf_" + str(d) + ".pkl")
+        sAFlow = clusterMAF.load(base + "cgm_cluster_maf_" + str(d) + ".pkl")
     except:
         _ = clusterMAF(s)
         nn = int((17424/_.cluster_number/2904)//1 + 1)
