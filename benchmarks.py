@@ -129,7 +129,7 @@ def calc_kl(samples, Flow, base):
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
     target_logprob -= logsumexp(target_logprob)
-    delta_logprob = logprob - target_logprob
+    delta_logprob = target_logprob - logprob
     kldiv = np.mean(delta_logprob)
 
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
@@ -172,7 +172,7 @@ for d in range(10):
         sAFlow.train(epochs, early_stop=True)
         sAFlow.save(base + "rm_single_maf_" + str(d) + ".pkl")
     samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(samples, sAFlow, rm)
+    kldiv, kl_error = calc_kl(s, sAFlow, rm)
     rm_maf_kls.append([kldiv, kl_error])
     axes[2, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -191,7 +191,7 @@ for d in range(10):
         sAFlow.train(pEpochs, early_stop=True)
         sAFlow.save(base + "rm_cluster_maf_" + str(d) + ".pkl")
     samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(samples, sAFlow, rm)
+    kl, kl_error = calc_kl(s, sAFlow, rm)
     rm_clus_kls.append([kl, kl_error])
     axes[2, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -204,13 +204,13 @@ for d in range(10):
         file = open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(samples).detach().numpy()
-    target_logprob = rm.log_prob(samples).detach().numpy()
+    logprob = model.log_prob(s).detach().numpy()
+    target_logprob = rm.log_prob(s).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
     target_logprob -= logsumexp(target_logprob)
-    delta_logprob = logprob - target_logprob
+    delta_logprob = target_logprob - logprob
     kldiv = np.mean(delta_logprob)
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
     rm_nvp_kls.append([kldiv, kl_error])
@@ -230,7 +230,7 @@ for d in range(10):
         flow.train(epochs, early_stop=True)
         flow.save(base + "tm_single_maf_" + str(d) + ".pkl")
     samples = flow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(samples, flow, tm)
+    kldiv, kl_error = calc_kl(s, flow, tm)
     tm_maf_kls.append([kldiv, kl_error])
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -249,7 +249,7 @@ for d in range(10):
         sAFlow.train(pEpochs, early_stop=True)
         sAFlow.save(base + "tm_cluster_maf_" + str(d) + ".pkl")
     samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(samples, sAFlow, tm)
+    kldiv, kl_error = calc_kl(s, sAFlow, tm)
     tm_clus_kls.append([kldiv, kl_error])
     axes[0, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -262,13 +262,13 @@ for d in range(10):
         file = open(base + "tm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(samples).detach().numpy()
-    target_logprob = tm.log_prob(samples).detach().numpy()
+    logprob = model.log_prob(s).detach().numpy()
+    target_logprob = tm.log_prob(s).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
     target_logprob -= logsumexp(target_logprob)
-    delta_logprob = logprob - target_logprob
+    delta_logprob = target_logprob - logprob
     kldiv = np.mean(delta_logprob)
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
     tm_nvp_kls.append([kldiv, kl_error])
@@ -303,7 +303,7 @@ for d in range(10):
         sAFlow.train(epochs, early_stop=True)
         sAFlow.save(base + 'cgm_single_maf_' + str(d) + '.pkl')
     samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(samples, sAFlow, cgm)
+    kldiv, kl_error = calc_kl(s, sAFlow, cgm)
     cgm_maf_kls.append([kldiv, kl_error])
     axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -322,7 +322,7 @@ for d in range(10):
         sAFlow.train(pEpochs, early_stop=True)
         sAFlow.save(base + "cgm_cluster_maf_" + str(d) + ".pkl")
     samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(samples, sAFlow, cgm)
+    kldiv, kl_error = calc_kl(s, sAFlow, cgm)
     cgm_clus_kls.append([kldiv, kl_error])
     axes[1, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
@@ -335,13 +335,13 @@ for d in range(10):
         file = open(base + "cgm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
         pickle.dump(model,file)
     samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(samples).detach().numpy()
-    target_logprob = cgm.log_prob(samples).detach().numpy()
+    logprob = model.log_prob(s).detach().numpy()
+    target_logprob = cgm.log_prob(s).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
     target_logprob -= logsumexp(target_logprob)
-    delta_logprob = logprob - target_logprob
+    delta_logprob = target_logprob - logprob
     kldiv = np.mean(delta_logprob)
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
     cgm_nvp_kls.append([kldiv, kl_error])
