@@ -81,7 +81,7 @@ for d in range(10):
     if PLOT_CLUSTERS:
         fig, axes =plt.subplots(4, 4, figsize=(6.3, 10))
     else:
-        fig, axes = plt.subplots(2, 4, figsize=(6.3, 5))
+        fig, axes = plt.subplots(2, 4, figsize=(6.3, 4))
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
