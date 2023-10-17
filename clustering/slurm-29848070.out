@@ -1,0 +1,51 @@
+Loading rhel8/default-icl
+  Loading requirement: dot rhel8/slurm singularity/current rhel8/global
+    cuda/11.4 vgl/3.1/64 intel-oneapi-compilers/2022.1.0/gcc/b6zld2mz
+    intel-oneapi-mpi/2021.6.0/intel/guxuvcpm
+Changed directory to /rds/user/htjb2/hpc-work/piecewise-normalizing-flows-reviews.
+
+JobID: 29848070
+======
+Time: Tue 17 Oct 12:09:52 BST 2023
+Running on master node: cpu-q-88
+Current directory: /rds/user/htjb2/hpc-work/piecewise-normalizing-flows-reviews
+
+Nodes allocated:
+================
+cpu-q-88
+
+numtasks=76, numnodes=1, mpi_tasks_per_node=76 (OMP_NUM_THREADS=1)
+
+Executing command:
+==================
+python clustering.py 
+
+2023-10-17 12:09:58.630128: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-10-17 12:09:58.840275: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-10-17 12:10:01.003094: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2023-10-17 12:10:07.092746: E tensorflow/compiler/xla/stream_executor/cuda/cuda_driver.cc:268] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+2023-10-17 12:10:08.231180: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0xc5e0710 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2023-10-17 12:10:08.231363: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2023-10-17 12:10:08.322517: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:255] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+2023-10-17 12:10:08.800507: I ./tensorflow/compiler/jit/device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2023-10-17 12:10:09.222538: W tensorflow/compiler/tf2xla/kernels/random_ops.cc:57] Warning: Using tf.random.uniform with XLA compilation will ignore seeds; consider using tf.random.stateless_uniform instead if reproducible behavior is desired. random_uniform/RandomUniform
+WARNING:tensorflow:5 out of the last 5 calls to <function MAF.log_prob at 0x14bc798403a0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:6 out of the last 6 calls to <function MAF.log_prob at 0x14bc798769d0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:5 out of the last 6 calls to <function clusterMAF.__call__ at 0x14bc7861b280> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:6 out of the last 7 calls to <function clusterMAF.__call__ at 0x14bc900443a0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+/rds/user/htjb2/hpc-work/piecewise-normalizing-flows-reviews/myenv/lib/python3.8/site-packages/margarine/clustered.py:174: UserWarning: The number of clusters is 20. This is the maximum number of clusters that can be used. If you require more clusters, please specify the 'cluster_number' kwarg. margarine will continue with 20 clusters.
+  warnings.warn("The number of clusters is 20. " +
+WARNING:tensorflow:5 out of the last 5 calls to <function MAF.__call__ at 0x14bc56997670> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:5 out of the last 5 calls to <function MAF.sample at 0x14bc544d33a0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:6 out of the last 6 calls to <function MAF.__call__ at 0x14bbe53c7ee0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:6 out of the last 6 calls to <function MAF.sample at 0x14bbe7508700> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+/rds/user/htjb2/hpc-work/piecewise-normalizing-flows-reviews/myenv/lib/python3.8/site-packages/margarine/clustered.py:174: UserWarning: The number of clusters is 20. This is the maximum number of clusters that can be used. If you require more clusters, please specify the 'cluster_number' kwarg. margarine will continue with 20 clusters.
+  warnings.warn("The number of clusters is 20. " +
+maf 0.04031182 0.028188227102607325
+kmeans 0.036751173 0.014605213892256943
+minbatchkmeans 0.036751173 0.014605213892256943
+mean_shift 0.039975084 0.016644943875773675
+spectral_clustering 0.80715007 0.07794943311681986
+agglomerative_clustering 0.4231082 0.06230989730486836
+birch 0.035159063 0.014266189726573182
