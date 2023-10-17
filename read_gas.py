@@ -1,5 +1,5 @@
-from mpi4py import MPI
 import numpy as np
+from mpi4py import MPI
 from datasets.gas import GAS
 from margarine.maf import MAF
 from margarine.clustered import clusterMAF
@@ -17,18 +17,18 @@ if rank == 0:
 	data_test = gas.tst.x
 
 	try:
-		flow = MAF.load('gas_maf.pkl')
+		flow = MAF.load('physical_benchmarks/gas_maf.pkl')
 	except FileNotFoundError:
 		flow = MAF(data_train)
 		flow.train(10000, early_stop=True)
-		flow.save('gas_maf.pkl')
+		flow.save('physical_benchmarks/gas_maf.pkl')
 
 comm.bcast(data_train, root=0)
 comm.bcast(data_test, root=0)
 comm.Barrier()
 
 if rank != 0:
-	flow = MAF.load('gas_maf.pkl')
+	flow = MAF.load('physical_benchmarks/gas_maf.pkl')
 
 perrank = len(data_test)//size
 
@@ -51,7 +51,7 @@ if rank == 0:
 	print('-'*20 + 'global maf done' + '_'*20)
 	
 	try:
-		flow = clusterMAF.load('gas_clustermaf.plkl')
+		flow = clusterMAF.load('physical_benchmarks/gas_clustermaf.plkl')
 	except FileNotFoundError:
 		_ = clusterMAF(data_train)
 		nn = math.ciel(17424/_.cluster_number/2904)
@@ -63,12 +63,12 @@ if rank == 0:
 		flow = clusterMAF(data_train, cluster_number=_.cluster_number, 
 				cluster_labels=labels, number_networks=nn)
 		flow.train(10000, early_stop=True)
-		flow.save('gas_clustermaf.pkl')
+		flow.save('physical_benchmarks/gas_clustermaf.pkl')
 
 comm.Barrier()
 
 if rank != 0:
-	flow = clusterMAF.load('gas_clustermaf.pkl')
+	flow = clusterMAF.load('physical_benchmarks/gas_clustermaf.pkl')
 
 lps = []
 for i in range((rank)*perrank, (rank+1)*perrank):
