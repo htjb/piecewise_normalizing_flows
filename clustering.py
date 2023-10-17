@@ -54,7 +54,7 @@ def calc_kl(samples, Flow, base):
     target_logprob = target_logprob[mask]
     logprob -= logsumexp(logprob)
     target_logprob -= logsumexp(target_logprob)
-    delta_logprob = logprob - target_logprob
+    delta_logprob = target_logprob - logprob
     kldiv = np.mean(delta_logprob)
 
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
