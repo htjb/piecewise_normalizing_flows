@@ -61,7 +61,7 @@ if rank == 0:
 		s_not_improv = 0
 		while k < kmax and s_not_improv < 2:
 			print(k)
-			dt = data_train.copy()[np.random.choice(len(data_train), 25000)]
+			dt = data_train.copy()[np.random.choice(len(data_train), 50000)]
 			sc = MiniBatchKMeans(k, random_state=0)
 			labels = sc.fit_predict(dt)
 			losses.append(-silhouette_score(dt, labels))
@@ -69,6 +69,8 @@ if rank == 0:
 			if len(losses) > 2:
 				if losses[-1] > losses[-2]:
 					s_not_improv += 1
+				else:
+					s_not_improv = 0
 			k += 1
 
 		losses = np.array(losses)
