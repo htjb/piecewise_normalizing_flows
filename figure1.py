@@ -22,7 +22,7 @@ axes[0].hist2d(data[:, 0], data[:, 1], bins=80, cmap='Blues')
 
 # try and load the example maf only flow else generate and plot samples
 try:
-    bij = MAF.load("figure1_normal_maf_.pkl")
+    bij = MAF.load("figure1_normal_maf.pkl")
 except:
     bij = MAF(samples[names].values, 
               weights=samples.get_weights().astype('float64'))
@@ -33,7 +33,7 @@ axes[1].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80, cmap='Blues')
 
 # try and load the example cluster maf only flow else generate and plot samples
 try:
-    bij = clusterMAF.load("figure1_cluster_.pkl")
+    bij = clusterMAF.load("figure1_cluster.pkl")
 except:
     bij = clusterMAF(samples[names].values, 
               weights=samples.get_weights().astype('float64'), clustering=True)
