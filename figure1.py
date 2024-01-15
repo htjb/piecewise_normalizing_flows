@@ -43,7 +43,7 @@ bij_samples = bij.sample(nsamples)
 axes[2].hist2d(bij_samples[:, 0], bij_samples[:, 1], bins=80, cmap='Blues')
 
 # formatting
-title = ['Target.', 'MAF\nGaussian Base\ne.g. Papamakarios et al. 2017', 
+title = ['Target', 'MAF\nGaussian Base\ne.g. Papamakarios et al. 2017', 
          'Piecewise MAF\nGaussian Base\nThis work']
 for i in range(len(axes)):
     axes[i].set_xticks([])
