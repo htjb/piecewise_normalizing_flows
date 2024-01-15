@@ -12,6 +12,12 @@ from sklearn.cluster import (KMeans,
                                 AgglomerativeClustering,
                                 Birch, MiniBatchKMeans)
 from sklearn.metrics import silhouette_score
+from sklearn.model_selection import train_test_split
+from tqdm import tqdm
+import normflows as nf
+import larsflow as lf
+import torch
+import pickle
 import os
 
 # figure formatting
@@ -25,6 +31,93 @@ mpl.rcParams['axes.prop_cycle'] = mpl.cycler('color',
 #rc('font', family='serif')
 #rc('font', serif='cm')
 rc('savefig', pad_inches=0.05)
+
+def create_model(p, base='gauss'):
+
+    """this function and the next are taken from Vincent Stimpers work
+    on realNVPs with resampled bases
+    https://github.com/VincentStimper/resampled-base-flows"""
+
+    # Set up model
+
+    # Define flows
+    K = 8
+    torch.manual_seed(10)
+
+    latent_size = 2
+    b = torch.Tensor([1 if i % 2 == 0 else 0 for i in range(latent_size)])
+    flows = []
+    for i in range(K):
+        param_map = nf.nets.MLP([latent_size // 2, 17, 17, latent_size], init_zeros=True)
+        flows += [nf.flows.AffineCouplingBlock(param_map)]
+        flows += [nf.flows.Permute(latent_size, mode='swap')]
+        flows += [nf.flows.ActNorm(latent_size)]
+
+    # Set prior and q0
+    if base == 'resampled':
+        a = nf.nets.MLP([latent_size, 128, 128, 1], output_fn="sigmoid")
+        q0 = lf.distributions.ResampledGaussian(latent_size, a, 100, 0.1, trainable=False)
+    elif base == 'gaussian_mixture':
+        n_modes = 10
+        q0 = nf.distributions.GaussianMixture(n_modes, latent_size, trainable=True,
+                                              loc=(np.random.rand(n_modes, latent_size) - 0.5) * 5,
+                                              scale=0.5 * np.ones((n_modes, latent_size)))
+    elif base == 'gauss':
+        q0 = nf.distributions.DiagGaussian(latent_size, trainable=False)
+    else:
+        raise NotImplementedError('This base distribution is not implemented.')
+
+    # Construct flow model
+    model = lf.NormalizingFlow(q0=q0, flows=flows, p=p)
+
+    # Move model on GPU if available
+    return model.to(device)
+
+def train(model, max_iter=20000, num_samples=2 ** 10, lr=1e-3, weight_decay=1e-3, 
+          q0_weight_decay=1e-4):
+    """
+    train() has been modified to include early stopping
+    This is the train for the realNVP from stimper et al.
+    """
+    # Do mixed precision training
+    optimizer = torch.optim.Adam(model.parameters(),  lr=lr, weight_decay=weight_decay)
+    model.train()
+
+    x = model.p.sample(num_samples)
+    w = np.ones(len(x))
+    x_train, x_test, w_train, w_test = train_test_split(x, w, test_size=0.2)
+
+    train_loss = []
+    test_loss = []
+    c = 0
+    for it in tqdm(range(max_iter)):
+
+        loss = model.forward_kld(x_train)
+        train_loss.append(loss)
+        test_loss.append(model.forward_kld(x_test).detach())
+
+        loss.backward()
+        optimizer.step()
+
+        # Clear gradients
+        nf.utils.clear_grad(model)
+
+        c += 1
+        if it == 0:
+            minimum_loss = test_loss[-1]
+            minimum_epoch = it
+            minimum_model = None
+        else:
+            if test_loss[-1] < minimum_loss:
+                minimum_loss = test_loss[-1]
+                minimum_epoch = it
+                minimum_model = model
+                c = 0
+        #print(i, minimum_epoch, minimum_loss.numpy(), test_loss[-1].numpy())
+        if minimum_model:
+            if c == round((max_iter/100)*2):
+                print('Early stopped. Epochs used = ' + str(it))
+                return minimum_model
 
 def get_cluster_number(cluster_algorithm, samples):
 
@@ -60,7 +153,7 @@ def calc_kl(samples, Flow, base):
     kl_error = np.std(delta_logprob)/np.sqrt(len(delta_logprob))
     return kldiv, kl_error
 
-PLOT_CLUSTERS = False
+device = torch.device('cpu')
 
 nsample= 10000
 kl_nsample= 10000
@@ -78,20 +171,13 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 kls_repeats, errorkl_repeats = [], []
 for d in range(10):
     kls, kl_errors = [], []
-    if PLOT_CLUSTERS:
-        fig, axes =plt.subplots(4, 4, figsize=(6.3, 10))
-    else:
-        fig, axes = plt.subplots(2, 4, figsize=(6.3, 4))
+    fig, axes = plt.subplots(3, 3, figsize=(5, 5))
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
     s = rm.sample(nsample).numpy()
     axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
     axes[0, 0].set_title('Target')
-    if PLOT_CLUSTERS:
-        axes[2, 0].scatter(s[:, 0], s[:, 1], s=1, c='C0',
-                           cmap='inferno')
-        axes[2, 0].set_title('Target')
 
     try:
         sAFlow = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
@@ -105,10 +191,19 @@ for d in range(10):
     kl_errors.append(kl_error)
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
     axes[0, 1].set_title('MAF')
-    if PLOT_CLUSTERS:
-        axes[2, 1].scatter(s[:, 0], s[:, 1], s=1, c='C0',
-                           cmap='inferno')
-        axes[2, 1].set_title('MAF')
+
+    try:
+        rmrealnvp = pickle.load(open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        print('successfully loaded rm realnvp')
+    except:
+        rmrealnvp = create_model(rm, 'resampled')
+        rmrealnvp = train(rmrealnvp)
+        file = open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
+        pickle.dump(rmrealnvp,file)
+    samples = rmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
+    samples = samples.detach().numpy()
+    axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[0, 2].set_title('RealNVP')
 
     # kmeans flow for ring model
     try:
@@ -128,13 +223,9 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 2].set_title('K-Means')
-    if PLOT_CLUSTERS:
-        for i in range(np.unique(sAFlow.cluster_labels).shape[0]):
-            axes[2, 2].scatter(sAFlow.split_theta[i][:, 0], sAFlow.split_theta[i][:, 1], 
-                            s=1, c=plt.get_cmap('inferno')(np.unique(sAFlow.cluster_labels)[i]/sAFlow.cluster_number))
-        axes[2, 2].set_title('K-Means')
+    axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 0].set_title('K-Means')
+    
 
     # minibatch kmeans flow for ring model
     try:
@@ -164,8 +255,8 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[0, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 3].set_title('MiniBatchKMeans')
+    axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 1].set_title('MiniBatchKMeans')
 
     
     # mean_shift flow for ring model
@@ -186,8 +277,8 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 0].set_title('MeanShift')
+    axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 2].set_title('MeanShift')
 
     # spectral_clustering flow for ring model
     try:
@@ -217,15 +308,9 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 1].set_title('Spectral \n Clustering')
-    if PLOT_CLUSTERS:
-        for i in range(len(np.unique(sAFlow.cluster_labels)+1)):
-            print(i)
-            print(np.unique(sAFlow.cluster_labels))
-            axes[3, 1].scatter(sAFlow.split_theta[i][:, 0], sAFlow.split_theta[i][:, 1], 
-                            s=1, c=plt.get_cmap('inferno')(np.unique(sAFlow.cluster_labels)[i]/sAFlow.cluster_number))
-        axes[3, 1].set_title('Spectral \n Clustering')
+    axes[2, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[2, 0].set_title('Spectral \n Clustering')
+    
 
     # agglomerative_clustering flow for ring model
     try:
@@ -255,8 +340,8 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 2].set_title('Agglomerative \n Clustering')
+    axes[2, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[2, 1].set_title('Agglomerative \n Clustering')
 
 
     # Birch flow for ring model
@@ -287,8 +372,8 @@ for d in range(10):
     kl, kl_error = calc_kl(s, sAFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 3].set_title('Birch')
+    axes[2, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[2, 2].set_title('Birch')
 
     for i in range(len(axes)):
         for j in range(axes.shape[-1]):
@@ -296,10 +381,7 @@ for d in range(10):
             axes[i, j].set_yticks([])
 
     plt.tight_layout()
-    if PLOT_CLUSTERS:
-        plt.savefig(base + 'clustering_' + str(d) + '_clusters.pdf')
-    else:
-        plt.savefig(base + 'clustering_' + str(d) + '.pdf')
+    plt.savefig(base + 'clustering_' + str(d) + '.pdf')
     #plt.show()
     plt.close()
 
