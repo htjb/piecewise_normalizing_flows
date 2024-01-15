@@ -167,19 +167,21 @@ for d in range(10):
 
      # noraml maf for ring model
     try:
-        sAFlow = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
+        rmmaf = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
+        print('successfully loaded rm single maf')
     except:
-        sAFlow = MAF(s)
-        sAFlow.train(epochs, early_stop=True)
-        sAFlow.save(base + "rm_single_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(s, sAFlow, rm)
+        rmmaf = MAF(s)
+        rmmaf.train(epochs, early_stop=True)
+        rmmaf.save(base + "rm_single_maf_" + str(d) + ".pkl")
+    samples = rmmaf.sample(kl_nsample).numpy()
+    kldiv, kl_error = calc_kl(s, rmmaf, rm)
     rm_maf_kls.append([kldiv, kl_error])
     axes[2, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # cluster flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_cluster_maf_" + str(d) + ".pkl")
+        rmcmaf = clusterMAF.load(base + "rm_cluster_maf_" + str(d) + ".pkl")
+        print('successfully loaded rm cluster maf')
     except:
         _ = clusterMAF(s)
         nn = int((17424/_.cluster_number/2904)//1 + 1)
@@ -187,25 +189,26 @@ for d in range(10):
 
         kmeans = KMeans(_.cluster_number, random_state=0)
         labels = kmeans.fit(s).predict(s)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        rmcmaf = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=_.cluster_number, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_cluster_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        rmcmaf.train(pEpochs, early_stop=True)
+        rmcmaf.save(base + "rm_cluster_maf_" + str(d) + ".pkl")
+    samples = rmcmaf.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, rmcmaf, rm)
     rm_clus_kls.append([kl, kl_error])
     axes[2, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # realNVP with reasampled base for ring model
     try:
-        model = pickle.load(open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        rmrealnvp = pickle.load(open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        print('successfully loaded rm realnvp')
     except:
-        model = create_model(rm, 'resampled')
-        model = train(model)
+        rmrealnvp = create_model(rm, 'resampled')
+        rmrealnvp = train(rmrealnvp)
         file = open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
-        pickle.dump(model,file)
-    samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s_kl).detach().numpy()
+        pickle.dump(rmrealnvp,file)
+    samples = rmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
+    logprob = rmrealnvp.log_prob(s_kl).detach().numpy()
     target_logprob = rm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
@@ -220,24 +223,27 @@ for d in range(10):
 
     tm = TwoMoons()
 
-    s = tm.sample(nsample).numpy()
+    s_kl = tm.sample(nsample)
+    s = s_kl.numpy()
     axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
     # noraml maf for two moons
     try:
-        flow = MAF.load(base + "tm_single_maf_" + str(d) + ".pkl")
+        tmmaf = MAF.load(base + "tm_single_maf_" + str(d) + ".pkl")
+        print('successfully loaded tm single maf')
     except:
-        flow = MAF(s)
-        flow.train(epochs, early_stop=True)
-        flow.save(base + "tm_single_maf_" + str(d) + ".pkl")
-    samples = flow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(s, flow, tm)
+        tmmaf = MAF(s)
+        tmmaf.train(epochs, early_stop=True)
+        tmmaf.save(base + "tm_single_maf_" + str(d) + ".pkl")
+    samples = tmmaf.sample(kl_nsample).numpy()
+    kldiv, kl_error = calc_kl(s, tmmaf, tm)
     tm_maf_kls.append([kldiv, kl_error])
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # cluster flow for two moons
     try:
-        sAFlow = clusterMAF.load(base + "tm_cluster_maf_" + str(d) + ".pkl")
+        tmcmaf= clusterMAF.load(base + "tm_cluster_maf_" + str(d) + ".pkl")
+        print('successfully loaded tm cluster maf')
     except:
         _ = clusterMAF(s)
         nn = int((17424/_.cluster_number/2904)//1 + 1)
@@ -245,25 +251,26 @@ for d in range(10):
 
         kmeans = KMeans(_.cluster_number, random_state=0)
         labels = kmeans.fit(s).predict(s)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        tmcmaf = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=_.cluster_number, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "tm_cluster_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(s, sAFlow, tm)
+        tmcmaf.train(pEpochs, early_stop=True)
+        tmcmaf.save(base + "tm_cluster_maf_" + str(d) + ".pkl")
+    samples = tmcmaf.sample(kl_nsample).numpy()
+    kldiv, kl_error = calc_kl(s, tmcmaf, tm)
     tm_clus_kls.append([kldiv, kl_error])
     axes[0, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # realNVP with reasampled base for two moons
     try:
-        model = pickle.load(open(base + "tm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        tmrealnvp = pickle.load(open(base + "tm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        print('successfully loaded tm realnvp')
     except:
-        model = create_model(tm, 'resampled')
-        model = train(model)
+        tmrealnvp = create_model(tm, 'resampled')
+        tmrealnvp = train(tmrealnvp)
         file = open(base + "tm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
-        pickle.dump(model,file)
-    samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s_kl).detach().numpy()
+        pickle.dump(tmrealnvp,file)
+    samples = tmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
+    logprob = tmrealnvp.log_prob(s_kl).detach().numpy()
     target_logprob = tm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
@@ -292,25 +299,27 @@ for d in range(10):
 
     cgm = CircularGaussianMixture()
 
-    s = cgm.sample(nsample).numpy()
-
+    s_kl = cgm.sample(nsample)
+    s = s_kl.numpy()
     axes[1, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
     # noraml maf for circle of gaussians
     try:
-        sAFlow = MAF.load(base + 'cgm_single_maf_' + str(d) + '.pkl')
+        cgmmaf = MAF.load(base + 'cgm_single_maf_' + str(d) + '.pkl')
+        print('successfully loaded cgm single maf')
     except:
-        sAFlow = MAF(s)
-        sAFlow.train(epochs, early_stop=True)
-        sAFlow.save(base + 'cgm_single_maf_' + str(d) + '.pkl')
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(s, sAFlow, cgm)
+        cgmmaf = MAF(s)
+        cgmmaf.train(epochs, early_stop=True)
+        cgmmaf.save(base + 'cgm_single_maf_' + str(d) + '.pkl')
+    samples = cgmmaf.sample(kl_nsample).numpy()
+    kldiv, kl_error = calc_kl(s, cgmmaf, cgm)
     cgm_maf_kls.append([kldiv, kl_error])
     axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # cluster flow for circle of gaussians
     try:
-        sAFlow = clusterMAF.load(base + "cgm_cluster_maf_" + str(d) + ".pkl")
+        cgmcmaf = clusterMAF.load(base + "cgm_cluster_maf_" + str(d) + ".pkl")
+        print('successfully loaded cgm cluster maf')
     except:
         _ = clusterMAF(s)
         nn = int((17424/_.cluster_number/2904)//1 + 1)
@@ -318,25 +327,26 @@ for d in range(10):
 
         kmeans = KMeans(_.cluster_number, random_state=0)
         labels = kmeans.fit(s).predict(s)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        cgmcmaf = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=_.cluster_number, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "cgm_cluster_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kldiv, kl_error = calc_kl(s, sAFlow, cgm)
+        cgmcmaf.train(pEpochs, early_stop=True)
+        cgmcmaf.save(base + "cgm_cluster_maf_" + str(d) + ".pkl")
+    samples = cgmcmaf.sample(kl_nsample).numpy()
+    kldiv, kl_error = calc_kl(s, cgmcmaf, cgm)
     cgm_clus_kls.append([kldiv, kl_error])
     axes[1, 3].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
 
     # realNVP with reasampled base for circle of gaussians
     try:
-        model = pickle.load(open(base + "cgm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        cgmrealnvp = pickle.load(open(base + "cgm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
+        print('successfully loaded cgm realnvp')
     except:
-        model = create_model(cgm, 'resampled')
-        model = train(model)
+        cgmrealnvp = create_model(cgm, 'resampled')
+        cgmrealnvp = train(cgmrealnvp)
         file = open(base + "cgm_realnvp_resampled_base_" + str(d) + ".pkl","wb")
-        pickle.dump(model,file)
-    samples = model.sample(kl_nsample)[0]#.detach().numpy()
-    logprob = model.log_prob(s_kl).detach().numpy()
+        pickle.dump(cgmrealnvp,file)
+    samples = cgmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
+    logprob = cgmrealnvp.log_prob(s_kl).detach().numpy()
     target_logprob = cgm.log_prob(s_kl).detach().numpy()
     logprob, mask = mask_arr(logprob)
     target_logprob = target_logprob[mask]
