@@ -63,6 +63,7 @@ def load_data_no_discrete_normalised_as_array(path):
     return data_train, data_validate, data_test
 
 data_train, data_validate, data_test = load_data_no_discrete_normalised_as_array("raw_physical_data/hepmass/")
+print('data shape: ', data_train.shape)
 
 from margarine.clustered import clusterMAF
 from margarine.maf import MAF
@@ -79,7 +80,7 @@ except FileNotFoundError:
 lps = flow.log_prob(data_test.astype(np.float32))
 mask = np.isfinite(lps)
 print(np.mean(lps[mask]))
-print(np.std(lps[mask]) / np.sqrt(len(lps[mask])))
+print(np.std(lps[mask]) / np.sqrt(len(lps[mask]))*2)
 
 try:
     flow = clusterMAF.load('physical_benchmarks/hep_clustermaf.pkl')
@@ -95,7 +96,8 @@ except:
     flow.train(10000, early_stop=True)
     flow.save('physical_benchmarks/hep_clustermaf.pkl')
 
+print('number clusters: ', flow.cluster_number)
 lps = flow.log_prob(data_test.astype(np.float32))
 mask = np.isfinite(lps)
 print(np.mean(lps[mask]))
-print(np.std(lps[mask]) / np.sqrt(len(lps[mask])))
+print(np.std(lps[mask]) / np.sqrt(len(lps[mask]))*2)
