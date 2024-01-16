@@ -24,12 +24,12 @@ import os
 mpl.rcParams['axes.prop_cycle'] = mpl.cycler('color',
     ['ff7f00', '984ea3', '999999', '377eb8', 
      '4daf4a','f781bf', 'a65628', 'e41a1c', 'dede00'])
-#mpl.rcParams['text.usetex'] = True
+mpl.rcParams['text.usetex'] = True
 #mpl.rcParams['text.latex.preamble'] = [
 #    r'\usepackage{amsmath}',
 #    r'\usepackage{amssymb}']
-#rc('font', family='serif')
-#rc('font', serif='cm')
+rc('font', family='serif')
+rc('font', serif='cm')
 rc('savefig', pad_inches=0.05)
 
 def create_model(p, base='gauss'):
@@ -171,26 +171,26 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 kls_repeats, errorkl_repeats = [], []
 for d in range(1):
     kls, kl_errors = [], []
-    fig, axes = plt.subplots(3, 3, figsize=(5, 5))
+    fig, axes = plt.subplots(3, 3, figsize=(4, 4))
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
     s = rm.sample(nsample).numpy()
     axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
-    axes[0, 0].set_title('Target')
+    axes[0, 0].set_title(r'\normalsize Target')
 
     try:
-        sAFlow = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
+        singleMAF = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
     except:
-        sAFlow = MAF(s)
-        sAFlow.train(epochs, early_stop=True)
-        sAFlow.save(base + "rm_single_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        singleMAF = MAF(s)
+        singleMAF.train(epochs, early_stop=True)
+        singleMAF.save(base + "rm_single_maf_" + str(d) + ".pkl")
+    samples = singleMAF.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, singleMAF, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 1].set_title('MAF')
+    axes[0, 1].set_title(r'\normalsize MAF e.g. Papamakarios' + '\n' + r'\normalsize et al. 2017')
 
     try:
         rmrealnvp = pickle.load(open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
@@ -203,13 +203,13 @@ for d in range(1):
     samples = rmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
     samples = samples.detach().numpy()
     axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 2].set_title('RealNVP')
+    axes[0, 2].set_title(r'\normalsize RealNVP' + '\n' + r'\normalsize Stimper et al. 2022')
 
     #plt.text(0.5, 0.8, 'PNF', fontsize=14, transform=plt.gcf().transFigure)
 
     # kmeans flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_kmeans_maf_" + str(d) + ".pkl")
+        kmeansFlow = clusterMAF.load(base + "rm_kmeans_maf_" + str(d) + ".pkl")
     except:
         _ = clusterMAF(s)
         nn = int((17424/_.cluster_number/2904)//1 + 1)
@@ -217,21 +217,21 @@ for d in range(1):
 
         kmeans = KMeans(_.cluster_number, random_state=0)
         labels = kmeans.fit(s).predict(s)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        kmeansFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=_.cluster_number, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_kmeans_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        kmeansFlow.train(pEpochs, early_stop=True)
+        kmeansFlow.save(base + "rm_kmeans_maf_" + str(d) + ".pkl")
+    samples = kmeansFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, kmeansFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 0].set_title('K-Means')
+    axes[1, 0].set_title(r'\normalsize K-Means')
     
 
     # minibatch kmeans flow for ring model
     try:
-        SAFlow = clusterMAF.load(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
+        miniFlow = clusterMAF.load(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
     except:
         ks = np.arange(2, 21)
         losses = []
@@ -249,21 +249,21 @@ for d in range(1):
         nn = int((17424/n_clusters/2904)//1 + 1)
 
         print('number clusters: ', n_clusters, ' number_networks: ', nn)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        miniFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=n_clusters, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        miniFlow.train(pEpochs, early_stop=True)
+        miniFlow.save(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
+    samples = miniFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, miniFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 1].set_title('MiniBatchKMeans')
+    axes[1, 1].set_title(r'\large PNF This work'+ '\n' + r'\normalsize MiniBatchKMeans')
 
     
     # mean_shift flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_mean_shift_maf_" + str(d) + ".pkl")
+        meanFlow = clusterMAF.load(base + "rm_mean_shift_maf_" + str(d) + ".pkl")
     except:
 
         mean_shift = MeanShift(bandwidth=0.5, bin_seeding=True)
@@ -271,20 +271,20 @@ for d in range(1):
         n_clusters = len(np.unique(labels))
         nn = int((17424/n_clusters/2904)//1 + 1)
         print('number clusters: ', n_clusters, ' number_networks: ', nn)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        meanFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=n_clusters, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_mean_shift_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        meanFlow.train(pEpochs, early_stop=True)
+        meanFlow.save(base + "rm_mean_shift_maf_" + str(d) + ".pkl")
+    samples = meanFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, meanFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 2].set_title('MeanShift')
+    axes[1, 2].set_title(r'\normalsize MeanShift')
 
     # spectral_clustering flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
+        scFlow = clusterMAF.load(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
     except:
         ks = np.arange(2, 21)
         losses = []
@@ -302,21 +302,21 @@ for d in range(1):
         nn = int((17424/n_clusters/2904)//1 + 1)
 
         print('number clusters: ', n_clusters, ' number_networks: ', nn)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        scFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=n_clusters, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        scFlow.train(pEpochs, early_stop=True)
+        scFlow.save(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
+    samples = scFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, scFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[2, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 0].set_title('Spectral \n Clustering')
+    axes[2, 0].set_title(r'\normalsize Spectra' +'\n' + r'\normalsize Clustering')
     
 
     # agglomerative_clustering flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
+        acFlow = clusterMAF.load(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
     except:
         ks = np.arange(2, 21)
         losses = []
@@ -334,21 +334,21 @@ for d in range(1):
         nn = int((17424/n_clusters/2904)//1 + 1)
 
         print('number clusters: ', n_clusters, ' number_networks: ', nn)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        acFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=n_clusters, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        acFlow.train(pEpochs, early_stop=True)
+        acFlow.save(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
+    samples = acFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, acFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[2, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 1].set_title('Agglomerative \n Clustering')
+    axes[2, 1].set_title(r'\normalsize Agglomerative' + '\n' +  r'\normalsize Clustering')
 
 
     # Birch flow for ring model
     try:
-        sAFlow = clusterMAF.load(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
+        birchFlow = clusterMAF.load(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
     except:
         ks = np.arange(2, 21)
         losses = []
@@ -366,16 +366,16 @@ for d in range(1):
         nn = int((17424/n_clusters/2904)//1 + 1)
 
         print('number clusters: ', n_clusters, ' number_networks: ', nn)
-        sAFlow = clusterMAF(s, cluster_labels=labels, 
+        birchFlow = clusterMAF(s, cluster_labels=labels, 
                             cluster_number=n_clusters, number_networks=nn)
-        sAFlow.train(pEpochs, early_stop=True)
-        sAFlow.save(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
-    samples = sAFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, sAFlow, rm)
+        birchFlow.train(pEpochs, early_stop=True)
+        birchFlow.save(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
+    samples = birchFlow.sample(kl_nsample).numpy()
+    kl, kl_error = calc_kl(s, birchFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[2, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 2].set_title('Birch')
+    axes[2, 2].set_title(r'\normalsize Birch')
 
     for i in range(len(axes)):
         for j in range(axes.shape[-1]):
