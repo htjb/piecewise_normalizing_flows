@@ -169,7 +169,7 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 
 # repeating for N times to get errors on KLs
 kls_repeats, errorkl_repeats = [], []
-for d in range(10):
+for d in range(1):
     kls, kl_errors = [], []
     fig, axes = plt.subplots(3, 3, figsize=(5, 5))
 
@@ -204,6 +204,8 @@ for d in range(10):
     samples = samples.detach().numpy()
     axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
     axes[0, 2].set_title('RealNVP')
+
+    #plt.text(0.5, 0.8, 'PNF', fontsize=14, transform=plt.gcf().transFigure)
 
     # kmeans flow for ring model
     try:
