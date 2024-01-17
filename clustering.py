@@ -169,15 +169,15 @@ cluster_algorithms = ['maf', 'kmeans', 'minbatchkmeans', 'mean_shift', 'spectral
 
 # repeating for N times to get errors on KLs
 kls_repeats, errorkl_repeats = [], []
-for d in range(1):
+for d in range(10):
     kls, kl_errors = [], []
-    fig, axes = plt.subplots(3, 3, figsize=(4, 4))
+    fig, axes = plt.subplots(2, 3, figsize=(6.3, 4))
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
     s = rm.sample(nsample).numpy()
-    axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
-    axes[0, 0].set_title(r'\normalsize Target')
+    """axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
+    axes[0, 0].set_title(r'\normalsize Target')"""
 
     try:
         singleMAF = MAF.load(base + "rm_single_maf_" + str(d) + ".pkl")
@@ -189,10 +189,10 @@ for d in range(1):
     kl, kl_error = calc_kl(s, singleMAF, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 1].set_title(r'\normalsize MAF e.g. Papamakarios' + '\n' + r'\normalsize et al. 2017')
+    #axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    #axes[0, 1].set_title(r'\normalsize MAF e.g. Papamakarios' + '\n' + r'\normalsize et al. 2017')
 
-    try:
+    """try:
         rmrealnvp = pickle.load(open(base + "rm_realnvp_resampled_base_" + str(d) + ".pkl","rb"))
         print('successfully loaded rm realnvp')
     except:
@@ -203,7 +203,7 @@ for d in range(1):
     samples = rmrealnvp.sample(kl_nsample)[0]#.detach().numpy()
     samples = samples.detach().numpy()
     axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[0, 2].set_title(r'\normalsize RealNVP' + '\n' + r'\normalsize Stimper et al. 2022')
+    axes[0, 2].set_title(r'\normalsize RealNVP' + '\n' + r'\normalsize Stimper et al. 2022')"""
 
     #plt.text(0.5, 0.8, 'PNF', fontsize=14, transform=plt.gcf().transFigure)
 
@@ -225,8 +225,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, kmeansFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 0].set_title(r'\normalsize K-Means')
+    axes[0, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[0, 0].set_title(r'\normalsize K-Means')
     
 
     # minibatch kmeans flow for ring model
@@ -257,8 +257,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, miniFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 1].set_title(r'\large PNF This work'+ '\n' + r'\normalsize MiniBatchKMeans')
+    axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[0, 1].set_title(r'\normalsize MiniBatchKMeans')
 
     
     # mean_shift flow for ring model
@@ -279,8 +279,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, meanFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[1, 2].set_title(r'\normalsize MeanShift')
+    axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[0, 2].set_title(r'\normalsize MeanShift')
 
     # spectral_clustering flow for ring model
     try:
@@ -310,8 +310,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, scFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[2, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 0].set_title(r'\normalsize Spectra' +'\n' + r'\normalsize Clustering')
+    axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 0].set_title(r'\normalsize Spectra' +'\n' + r'\normalsize Clustering')
     
 
     # agglomerative_clustering flow for ring model
@@ -342,8 +342,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, acFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[2, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 1].set_title(r'\normalsize Agglomerative' + '\n' +  r'\normalsize Clustering')
+    axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 1].set_title(r'\normalsize Agglomerative' + '\n' +  r'\normalsize Clustering')
 
 
     # Birch flow for ring model
@@ -374,8 +374,8 @@ for d in range(1):
     kl, kl_error = calc_kl(s, birchFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
-    axes[2, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
-    axes[2, 2].set_title(r'\normalsize Birch')
+    axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
+    axes[1, 2].set_title(r'\normalsize Birch')
 
     for i in range(len(axes)):
         for j in range(axes.shape[-1]):
