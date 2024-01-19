@@ -155,8 +155,8 @@ def calc_kl(samples, Flow, base):
 
 device = torch.device('cpu')
 
-nsample= 10000
-kl_nsample= 10000
+nsample = 10000
+kl_nsample= 50000
 pEpochs = 20000
 epochs = 20000
 
@@ -176,6 +176,7 @@ for d in range(10):
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
     s = rm.sample(nsample).numpy()
+    skl = rm.sample(kl_nsample).numpy()
     """axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
     axes[0, 0].set_title(r'\normalsize Target')"""
 
@@ -186,7 +187,7 @@ for d in range(10):
         singleMAF.train(epochs, early_stop=True)
         singleMAF.save(base + "rm_single_maf_" + str(d) + ".pkl")
     samples = singleMAF.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, singleMAF, rm)
+    kl, kl_error = calc_kl(skl, singleMAF, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     #axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -222,7 +223,7 @@ for d in range(10):
         kmeansFlow.train(pEpochs, early_stop=True)
         kmeansFlow.save(base + "rm_kmeans_maf_" + str(d) + ".pkl")
     samples = kmeansFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, kmeansFlow, rm)
+    kl, kl_error = calc_kl(skl, kmeansFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[0, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -254,7 +255,7 @@ for d in range(10):
         miniFlow.train(pEpochs, early_stop=True)
         miniFlow.save(base + "rm_minibatch_kmeans_maf_" + str(d) + ".pkl")
     samples = miniFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, miniFlow, rm)
+    kl, kl_error = calc_kl(skl, miniFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[0, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -276,7 +277,7 @@ for d in range(10):
         meanFlow.train(pEpochs, early_stop=True)
         meanFlow.save(base + "rm_mean_shift_maf_" + str(d) + ".pkl")
     samples = meanFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, meanFlow, rm)
+    kl, kl_error = calc_kl(skl, meanFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[0, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -307,7 +308,7 @@ for d in range(10):
         scFlow.train(pEpochs, early_stop=True)
         scFlow.save(base + "rm_spectral_clustering_maf_" + str(d) + ".pkl")
     samples = scFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, scFlow, rm)
+    kl, kl_error = calc_kl(skl, scFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 0].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -339,7 +340,7 @@ for d in range(10):
         acFlow.train(pEpochs, early_stop=True)
         acFlow.save(base + "rm_agglomerative_clustering_maf_" + str(d) + ".pkl")
     samples = acFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, acFlow, rm)
+    kl, kl_error = calc_kl(skl, acFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 1].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')
@@ -371,7 +372,7 @@ for d in range(10):
         birchFlow.train(pEpochs, early_stop=True)
         birchFlow.save(base + "rm_birch_clustering_maf_" + str(d) + ".pkl")
     samples = birchFlow.sample(kl_nsample).numpy()
-    kl, kl_error = calc_kl(s, birchFlow, rm)
+    kl, kl_error = calc_kl(skl, birchFlow, rm)
     kls.append(kl)
     kl_errors.append(kl_error)
     axes[1, 2].hist2d(samples[:, 0], samples[:, 1], bins=80, cmap='Blues')

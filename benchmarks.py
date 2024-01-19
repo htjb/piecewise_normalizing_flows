@@ -144,7 +144,7 @@ lr_schedule = keras.optimizers.schedules.ExponentialDecay(
     decay_rate=0.9)
 
 nsample= 10000
-kl_nsample= 10000
+kl_nsample= 50000
 pEpochs = 20000
 epochs = 20000
 
@@ -161,7 +161,7 @@ for d in range(10):
 
     # generate samples with Stimpers RingMixture model
     rm = RingMixture()
-    s_kl = rm.sample(nsample)
+    s_kl = rm.sample(kl_nsample)
     s = s_kl.numpy()
     axes[2, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
@@ -223,7 +223,7 @@ for d in range(10):
 
     tm = TwoMoons()
 
-    s_kl = tm.sample(nsample)
+    s_kl = tm.sample(kl_nsample)
     s = s_kl.numpy()
     axes[0, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
@@ -299,7 +299,7 @@ for d in range(10):
 
     cgm = CircularGaussianMixture()
 
-    s_kl = cgm.sample(nsample)
+    s_kl = cgm.sample(kl_nsample)
     s = s_kl.numpy()
     axes[1, 0].hist2d(s[:, 0], s[:, 1], bins=80, cmap='Blues')
 
