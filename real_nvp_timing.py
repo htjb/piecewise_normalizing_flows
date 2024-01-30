@@ -158,7 +158,10 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
-    cost.append(it*nsample)
+    c = 0
+    for parameter in model.parameters():
+        c += len(parameter.flatten())
+    cost.append(it*nsample*c)
 
 print('Two Moons')
 print('Mean time: ', np.mean(times))
@@ -177,7 +180,10 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
-    cost.append(it*nsample)
+    c = 0
+    for parameter in model.parameters():
+        c += len(parameter.flatten())
+    cost.append(it*nsample*c)
 
 print('Circle Gaussian Mixture')
 print('Mean time: ', np.mean(times))
@@ -196,7 +202,10 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
-    cost.append(it*nsample)
+    c = 0
+    for parameter in model.parameters():
+        c += len(parameter.flatten())
+    cost.append(it*nsample*c)
 
 print('Ring Mixture')
 print('Mean time: ', np.mean(times))

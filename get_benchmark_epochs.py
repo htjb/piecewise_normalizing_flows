@@ -14,7 +14,7 @@ cgm = CircularGaussianMixture()
 tm = TwoMoons()
 rm = RingMixture()
 
-base_dir = 'timing2/'
+base_dir = 'timing/'
 
 try:
     cgm_maf_epochs = np.loadtxt(base_dir + 'cgm_maf_epochs.txt')
@@ -46,7 +46,7 @@ except:
     cgm_maf_cost, tm_maf_cost, rm_maf_cost = [], [], []
     cgm_clustermaf_cost, tm_clustermaf_cost, rm_clustermaf_cost = [], [], []
 
-for d in range(len(cgm_maf_cost), 2):
+for d in range(len(cgm_maf_cost), 3):
 
     s = cgm.sample(nsample).numpy()
 
@@ -60,7 +60,7 @@ for d in range(len(cgm_maf_cost), 2):
     hyps = 0
     for j, made in enumerate(sAFlow.mades):
         hyps += made.count_params()
-    cgm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
+    cgm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
     
     _ = clusterMAF(s)
     cgm_cluster_number.append(_.cluster_number)
@@ -81,8 +81,7 @@ for d in range(len(cgm_maf_cost), 2):
         hyps = 0
         for j, made in enumerate(sAFlow.flow[i].mades):
             hyps += made.count_params()
-        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
-                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*hyps)
     cgm_clustermaf_cost.append(np.sum(cost))
 
     s = tm.sample(nsample).numpy()
@@ -97,7 +96,7 @@ for d in range(len(cgm_maf_cost), 2):
     hyps = 0
     for j, made in enumerate(sAFlow.mades):
         hyps += made.count_params()
-    tm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
+    tm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
 
     _ = clusterMAF(s)
     tm_cluster_number.append(_.cluster_number)
@@ -118,8 +117,7 @@ for d in range(len(cgm_maf_cost), 2):
         hyps = 0
         for j, made in enumerate(sAFlow.flow[i].mades):
             hyps += made.count_params()
-        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
-                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*hyps)
     tm_clustermaf_cost.append(np.sum(cost))
 
     s = rm.sample(nsample).numpy()
@@ -134,7 +132,7 @@ for d in range(len(cgm_maf_cost), 2):
     hyps = 0
     for j, made in enumerate(sAFlow.mades):
         hyps += made.count_params()
-    rm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
+    rm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
 
     _ = clusterMAF(s)
     rm_cluster_number.append(_.cluster_number)
@@ -155,8 +153,7 @@ for d in range(len(cgm_maf_cost), 2):
         hyps = 0
         for j, made in enumerate(sAFlow.flow[i].mades):
             hyps += made.count_params()
-        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
-                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*hyps)
     rm_clustermaf_cost.append(np.sum(cost))
 
     np.savetxt(base_dir + 'cgm_maf_epochs.txt', cgm_maf_epochs)
