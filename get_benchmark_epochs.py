@@ -17,32 +17,32 @@ rm = RingMixture()
 base_dir = 'timing/'
 
 try:
-    cgm_maf_epochs = np.loadtxt(base_dir + 'cgm_maf_epochs.txt')
-    cgm_clustermaf_epochs = np.loadtxt(base_dir + 'cgm_clustermaf_epochs.txt')
-    tm_maf_epochs = np.loadtxt(base_dir + 'tm_maf_epochs.txt')
-    tm_clustermaf_epochs = np.loadtxt(base_dir + 'tm_clustermaf_epochs.txt')
-    rm_maf_epochs = np.loadtxt(base_dir + 'rm_maf_epochs.txt')
-    rm_clustermaf_epochs = np.loadtxt(base_dir + 'rm_clustermaf_epochs.txt')
+    cgm_maf_epochs = list(np.loadtxt(base_dir + 'cgm_maf_epochs.txt'))
+    cgm_clustermaf_epochs = list(np.loadtxt(base_dir + 'cgm_clustermaf_epochs.txt'))
+    tm_maf_epochs = list(np.loadtxt(base_dir + 'tm_maf_epochs.txt'))
+    tm_clustermaf_epochs = list(np.loadtxt(base_dir + 'tm_clustermaf_epochs.txt'))
+    rm_maf_epochs = list(np.loadtxt(base_dir + 'rm_maf_epochs.txt'))
+    rm_clustermaf_epochs = list(np.loadtxt(base_dir + 'rm_clustermaf_epochs.txt'))
 
-    cgm_maf_time = np.loadtxt(base_dir + 'cgm_maf_time.txt')
-    cgm_clustermaf_time = np.loadtxt(base_dir + 'cgm_clustermaf_time.txt')
-    tm_maf_time = np.loadtxt(base_dir + 'tm_maf_time.txt')
-    tm_clustermaf_time = np.loadtxt(base_dir + 'tm_clustermaf_time.txt')
-    rm_maf_time = np.loadtxt(base_dir + 'rm_maf_time.txt')
-    rm_clustermaf_time = np.loadtxt(base_dir + 'rm_clustermaf_time.txt')
+    cgm_maf_time = list(np.loadtxt(base_dir + 'cgm_maf_time.txt'))
+    cgm_clustermaf_time = list(np.loadtxt(base_dir + 'cgm_clustermaf_time.txt'))
+    tm_maf_time = list(np.loadtxt(base_dir + 'tm_maf_time.txt'))
+    tm_clustermaf_time = list(np.loadtxt(base_dir + 'tm_clustermaf_time.txt'))
+    rm_maf_time = list(np.loadtxt(base_dir + 'rm_maf_time.txt'))
+    rm_clustermaf_time = list(np.loadtxt(base_dir + 'rm_clustermaf_time.txt'))
     
-    cgm_maf_cost = np.loadtxt(base_dir + 'cgm_maf_cost.txt')
-    cgm_clustermaf_cost = np.loadtxt(base_dir + 'cgm_clustermaf_cost.txt')
-    tm_maf_cost = np.loadtxt(base_dir + 'tm_maf_cost.txt')
-    tm_clustermaf_cost = np.loadtxt(base_dir + 'tm_clustermaf_cost.txt')
-    rm_maf_cost = np.loadtxt(base_dir + 'rm_maf_cost.txt')
-    rm_clustermaf_cost = np.loadtxt(base_dir + 'rm_clustermaf_cost.txt')
+    cgm_maf_cost = list(np.loadtxt(base_dir + 'cgm_maf_cost.txt'))
+    cgm_clustermaf_cost = list(np.loadtxt(base_dir + 'cgm_clustermaf_cost.txt'))
+    tm_maf_cost = list(np.loadtxt(base_dir + 'tm_maf_cost.txt'))
+    tm_clustermaf_cost = list(np.loadtxt(base_dir + 'tm_clustermaf_cost.txt'))
+    rm_maf_cost = list(np.loadtxt(base_dir + 'rm_maf_cost.txt'))
+    rm_clustermaf_cost = list(np.loadtxt(base_dir + 'rm_clustermaf_cost.txt'))
 except:
     cgm_maf_epochs, tm_maf_epochs, rm_maf_epochs = [], [], []
     cgm_clustermaf_epochs, tm_clustermaf_epochs, rm_clustermaf_epochs = [], [], []
     cgm_maf_time, tm_maf_time, rm_maf_time = [], [], []
     cgm_clustermaf_time, tm_clustermaf_time, rm_clustermaf_time = [], [], []
-    cgm_cluster_number, tm_cluster_number, rm_cluster_number = [], [], []
+    #cgm_cluster_number, tm_cluster_number, rm_cluster_number = [], [], []
     cgm_maf_cost, tm_maf_cost, rm_maf_cost = [], [], []
     cgm_clustermaf_cost, tm_clustermaf_cost, rm_clustermaf_cost = [], [], []
 
@@ -63,7 +63,7 @@ for d in range(len(cgm_maf_cost), 3):
     cgm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
     
     _ = clusterMAF(s)
-    cgm_cluster_number.append(_.cluster_number)
+    #cgm_cluster_number.append(_.cluster_number)
     nn = int((17424/_.cluster_number/2904)//1 + 1)
     print('number clusters: ', _.cluster_number, ' number_networks: ', nn)
 
@@ -99,7 +99,7 @@ for d in range(len(cgm_maf_cost), 3):
     tm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
 
     _ = clusterMAF(s)
-    tm_cluster_number.append(_.cluster_number)
+    #tm_cluster_number.append(_.cluster_number)
     nn = int((17424/_.cluster_number/2904)//1 + 1)
     print('number clusters: ', _.cluster_number, ' number_networks: ', nn)
 
@@ -135,7 +135,7 @@ for d in range(len(cgm_maf_cost), 3):
     rm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*hyps)
 
     _ = clusterMAF(s)
-    rm_cluster_number.append(_.cluster_number)
+    #rm_cluster_number.append(_.cluster_number)
     nn = int((17424/_.cluster_number/2904)//1 + 1)
     print('number clusters: ', _.cluster_number, ' number_networks: ', nn)
 
