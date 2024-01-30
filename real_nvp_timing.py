@@ -150,7 +150,7 @@ if not os.path.exists(base):
     os.mkdir(base)
 
 tm = TwoMoons()
-times, epochs = [], []
+times, epochs, cost = [], [], []
 for d in range(5):
     s = time.time()
     model = create_model(tm, 'resampled')
@@ -158,15 +158,18 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
+    cost.append(it*nsample)
 
 print('Two Moons')
 print('Mean time: ', np.mean(times))
 print('Std time: ', np.std(times)/np.sqrt(len(times)))
 print('Mean epochs: ', np.mean(epochs))
 print('Std epochs: ', np.std(epochs)/np.sqrt(len(epochs)))
+print('Mean cost: ', np.mean(cost))
+print('Std cost: ', np.std(cost)/np.sqrt(len(cost)))
 
 cgm = CircularGaussianMixture()
-times, epochs = [], []
+times, epochs, cost = [], [], []
 for d in range(5):
     s = time.time()
     model = create_model(cgm, 'resampled')
@@ -174,15 +177,18 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
+    cost.append(it*nsample)
 
 print('Circle Gaussian Mixture')
 print('Mean time: ', np.mean(times))
 print('Std time: ', np.std(times)/np.sqrt(len(times)))
 print('Mean epochs: ', np.mean(epochs))
 print('Std epochs: ', np.std(epochs)/np.sqrt(len(epochs)))
+print('Mean cost: ', np.mean(cost))
+print('Std cost: ', np.std(cost)/np.sqrt(len(cost)))
 
 rm = RingMixture()
-times, epochs = [], []
+times, epochs, cost = [], [], []
 for d in range(5):
     s = time.time()
     model = create_model(rm, 'resampled')
@@ -190,11 +196,13 @@ for d in range(5):
     e = time.time()
     times.append(e-s)
     epochs.append(it)
+    cost.append(it*nsample)
 
 print('Ring Mixture')
 print('Mean time: ', np.mean(times))
 print('Std time: ', np.std(times)/np.sqrt(len(times)))
 print('Mean epochs: ', np.mean(epochs))
 print('Std epochs: ', np.std(epochs)/np.sqrt(len(epochs)))
-
+print('Mean cost: ', np.mean(cost))
+print('Std cost: ', np.std(cost)/np.sqrt(len(cost)))
     

@@ -14,14 +14,39 @@ cgm = CircularGaussianMixture()
 tm = TwoMoons()
 rm = RingMixture()
 
-cgm_maf_epochs, tm_maf_epochs, rm_maf_epochs = [], [], []
-cgm_clustermaf_epochs, tm_clustermaf_epochs, rm_clustermaf_epochs = [], [], []
-cgm_maf_time, tm_maf_time, rm_maf_time = [], [], []
-cgm_clustermaf_time, tm_clustermaf_time, rm_clustermaf_time = [], [], []
-cgm_cluster_number, tm_cluster_number, rm_cluster_number = [], [], []
-cgm_maf_cost, tm_maf_cost, rm_maf_cost = [], [], []
-cgm_clustermaf_cost, tm_clustermaf_cost, rm_clustermaf_cost = [], [], []
-for d in range(5):
+base_dir = 'timing2/'
+
+try:
+    cgm_maf_epochs = np.loadtxt(base_dir + 'cgm_maf_epochs.txt')
+    cgm_clustermaf_epochs = np.loadtxt(base_dir + 'cgm_clustermaf_epochs.txt')
+    tm_maf_epochs = np.loadtxt(base_dir + 'tm_maf_epochs.txt')
+    tm_clustermaf_epochs = np.loadtxt(base_dir + 'tm_clustermaf_epochs.txt')
+    rm_maf_epochs = np.loadtxt(base_dir + 'rm_maf_epochs.txt')
+    rm_clustermaf_epochs = np.loadtxt(base_dir + 'rm_clustermaf_epochs.txt')
+
+    cgm_maf_time = np.loadtxt(base_dir + 'cgm_maf_time.txt')
+    cgm_clustermaf_time = np.loadtxt(base_dir + 'cgm_clustermaf_time.txt')
+    tm_maf_time = np.loadtxt(base_dir + 'tm_maf_time.txt')
+    tm_clustermaf_time = np.loadtxt(base_dir + 'tm_clustermaf_time.txt')
+    rm_maf_time = np.loadtxt(base_dir + 'rm_maf_time.txt')
+    rm_clustermaf_time = np.loadtxt(base_dir + 'rm_clustermaf_time.txt')
+    
+    cgm_maf_cost = np.loadtxt(base_dir + 'cgm_maf_cost.txt')
+    cgm_clustermaf_cost = np.loadtxt(base_dir + 'cgm_clustermaf_cost.txt')
+    tm_maf_cost = np.loadtxt(base_dir + 'tm_maf_cost.txt')
+    tm_clustermaf_cost = np.loadtxt(base_dir + 'tm_clustermaf_cost.txt')
+    rm_maf_cost = np.loadtxt(base_dir + 'rm_maf_cost.txt')
+    rm_clustermaf_cost = np.loadtxt(base_dir + 'rm_clustermaf_cost.txt')
+except:
+    cgm_maf_epochs, tm_maf_epochs, rm_maf_epochs = [], [], []
+    cgm_clustermaf_epochs, tm_clustermaf_epochs, rm_clustermaf_epochs = [], [], []
+    cgm_maf_time, tm_maf_time, rm_maf_time = [], [], []
+    cgm_clustermaf_time, tm_clustermaf_time, rm_clustermaf_time = [], [], []
+    cgm_cluster_number, tm_cluster_number, rm_cluster_number = [], [], []
+    cgm_maf_cost, tm_maf_cost, rm_maf_cost = [], [], []
+    cgm_clustermaf_cost, tm_clustermaf_cost, rm_clustermaf_cost = [], [], []
+
+for d in range(len(cgm_maf_cost), 2):
 
     s = cgm.sample(nsample).numpy()
 
@@ -32,8 +57,11 @@ for d in range(5):
     e = time.time()
     cgm_maf_time.append(e-start)
     cgm_maf_epochs.append(len(sAFlow.loss_history))
-    cgm_maf_cost.append(len(sAFlow.loss_history)*nsample)
-
+    hyps = 0
+    for j, made in enumerate(sAFlow.mades):
+        hyps += made.count_params()
+    cgm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
+    
     _ = clusterMAF(s)
     cgm_cluster_number.append(_.cluster_number)
     nn = int((17424/_.cluster_number/2904)//1 + 1)
@@ -48,7 +76,14 @@ for d in range(5):
     e = time.time()
     cgm_clustermaf_time.append(e-start)
     cgm_clustermaf_epochs.append(np.sum([len(sAFlow.flow[i].loss_history) for i in range(len(sAFlow.flow))]))
-    cgm_clustermaf_cost.append(np.sum([len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta) for i in range(len(sAFlow.flow))]))
+    cost = []
+    for i in range(len(sAFlow.flow)):
+        hyps = 0
+        for j, made in enumerate(sAFlow.flow[i].mades):
+            hyps += made.count_params()
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
+                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+    cgm_clustermaf_cost.append(np.sum(cost))
 
     s = tm.sample(nsample).numpy()
 
@@ -59,7 +94,10 @@ for d in range(5):
     e = time.time()
     tm_maf_time.append(e-start)
     tm_maf_epochs.append(len(sAFlow.loss_history))
-    tm_maf_cost.append(len(sAFlow.loss_history)*nsample)
+    hyps = 0
+    for j, made in enumerate(sAFlow.mades):
+        hyps += made.count_params()
+    tm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
 
     _ = clusterMAF(s)
     tm_cluster_number.append(_.cluster_number)
@@ -75,7 +113,14 @@ for d in range(5):
     e = time.time()
     tm_clustermaf_time.append(e-start)
     tm_clustermaf_epochs.append(np.sum([len(sAFlow.flow[i].loss_history) for i in range(len(sAFlow.flow))]))
-    tm_clustermaf_cost.append(np.sum([len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta) for i in range(len(sAFlow.flow))]))
+    cost = []
+    for i in range(len(sAFlow.flow)):
+        hyps = 0
+        for j, made in enumerate(sAFlow.flow[i].mades):
+            hyps += made.count_params()
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
+                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+    tm_clustermaf_cost.append(np.sum(cost))
 
     s = rm.sample(nsample).numpy()
 
@@ -86,7 +131,10 @@ for d in range(5):
     e = time.time()
     rm_maf_time.append(e-start)
     rm_maf_epochs.append(len(sAFlow.loss_history))
-    rm_maf_cost.append(len(sAFlow.loss_history)*nsample)
+    hyps = 0
+    for j, made in enumerate(sAFlow.mades):
+        hyps += made.count_params()
+    rm_maf_cost.append(len(sAFlow.loss_history)*len(sAFlow.theta)*(len(sAFlow.theta)*0.8)**2*hyps)
 
     _ = clusterMAF(s)
     rm_cluster_number.append(_.cluster_number)
@@ -102,7 +150,37 @@ for d in range(5):
     e = time.time()
     rm_clustermaf_time.append(e-start)
     rm_clustermaf_epochs.append(np.sum([len(sAFlow.flow[i].loss_history) for i in range(len(sAFlow.flow))]))
-    rm_clustermaf_cost.append(np.sum([len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta) for i in range(len(sAFlow.flow))]))
+    cost = []
+    for i in range(len(sAFlow.flow)):
+        hyps = 0
+        for j, made in enumerate(sAFlow.flow[i].mades):
+            hyps += made.count_params()
+        cost.append(len(sAFlow.flow[i].loss_history)*len(sAFlow.flow[i].theta)*
+                    (len(sAFlow.flow[i].theta)*0.8)**2*hyps)
+    rm_clustermaf_cost.append(np.sum(cost))
+
+    np.savetxt(base_dir + 'cgm_maf_epochs.txt', cgm_maf_epochs)
+    np.savetxt(base_dir + 'cgm_clustermaf_epochs.txt', cgm_clustermaf_epochs)
+    np.savetxt(base_dir + 'tm_maf_epochs.txt', tm_maf_epochs)
+    np.savetxt(base_dir + 'tm_clustermaf_epochs.txt', tm_clustermaf_epochs)
+    np.savetxt(base_dir + 'rm_maf_epochs.txt', rm_maf_epochs)
+    np.savetxt(base_dir + 'rm_clustermaf_epochs.txt', rm_clustermaf_epochs)
+
+    np.savetxt(base_dir + 'cgm_maf_time.txt', cgm_maf_time)
+    np.savetxt(base_dir + 'cgm_clustermaf_time.txt', cgm_clustermaf_time)
+    np.savetxt(base_dir + 'tm_maf_time.txt', tm_maf_time)
+    np.savetxt(base_dir + 'tm_clustermaf_time.txt', tm_clustermaf_time)
+    np.savetxt(base_dir + 'rm_maf_time.txt', rm_maf_time)
+    np.savetxt(base_dir + 'rm_clustermaf_time.txt', rm_clustermaf_time)
+
+    np.savetxt(base_dir + 'cgm_maf_cost.txt', cgm_maf_cost)
+    np.savetxt(base_dir + 'cgm_clustermaf_cost.txt', cgm_clustermaf_cost)
+    np.savetxt(base_dir + 'tm_maf_cost.txt', tm_maf_cost)
+    np.savetxt(base_dir + 'tm_clustermaf_cost.txt', tm_clustermaf_cost)
+    np.savetxt(base_dir + 'rm_maf_cost.txt', rm_maf_cost)
+    np.savetxt(base_dir + 'rm_clustermaf_cost.txt', rm_clustermaf_cost)
+
+    
 
 
 print('cgm maf epochs: ', np.mean(cgm_maf_epochs), ' +/- ', np.std(cgm_maf_epochs)/np.sqrt(5))
@@ -132,7 +210,14 @@ print('tm clustermaf cost: ', np.mean(tm_clustermaf_cost),  ' +/- ', np.std(tm_c
 print('rm maf cost: ', np.mean(rm_maf_cost), ' +/- ', np.std(rm_maf_cost)/np.sqrt(5))
 print('rm clustermaf cost: ', np.mean(rm_clustermaf_cost),  ' +/- ', np.std(rm_clustermaf_cost)/np.sqrt(5))
 
-cgm_cluster_number = np.array(cgm_cluster_number)
+print('cgm clustermaf cost: ', np.mean(cgm_clustermaf_cost/cgm_maf_cost), ' +/- ', 
+      np.std(cgm_clustermaf_cost/cgm_maf_cost)/np.sqrt(5))
+print('tm clustermaf cost: ', np.mean(tm_clustermaf_cost/tm_maf_cost), ' +/- ',
+        np.std(tm_clustermaf_cost/tm_maf_cost)/np.sqrt(5))
+print('rm clustermaf cost: ', np.mean(rm_clustermaf_cost/rm_maf_cost), ' +/- ',
+       np.std(rm_clustermaf_cost/rm_maf_cost)/np.sqrt(5))
+
+"""cgm_cluster_number = np.array(cgm_cluster_number)
 tm_cluster_number = np.array(tm_cluster_number)
 rm_cluster_number = np.array(rm_cluster_number)
 
@@ -143,3 +228,4 @@ rm_clustermaf_time = np.array(rm_clustermaf_time)
 print('cgm time per cluster: ', np.mean(cgm_clustermaf_time/cgm_cluster_number), ' +/- ',  np.std(cgm_clustermaf_time/cgm_cluster_number)/np.sqrt(5))
 print('tm time per cluster: ', np.mean(tm_clustermaf_time/tm_cluster_number), ' +/- ',  np.std(tm_clustermaf_time/tm_cluster_number)/np.sqrt(5))
 print('rm time per cluster: ', np.mean(rm_clustermaf_time/rm_cluster_number), ' +/- ',  np.std(rm_clustermaf_time/rm_cluster_number)/np.sqrt(5))
+"""
